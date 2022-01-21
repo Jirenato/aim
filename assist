@@ -1,0 +1,54 @@
+local userInputService = game:service('UserInputService')
+local ScriptOn = false
+local VirtualUser=game:service'VirtualUser'
+local VIM = game:GetService("VirtualInputManager")
+local camera = game.workspace.Camera
+local player = game:GetService("Players").LocalPlayer.Character
+local players = game:GetService("Players").LocalPlayer
+local mouse = players:GetMouse()
+local playerz = game:GetService("Players")
+local teams = game:GetService("Teams")
+game:service'Players'.LocalPlayer.Idled:connect(function()
+VirtualUser:CaptureController()
+VirtualUser:ClickButton2(Vector2.new())
+print("Anti-Idle")
+end)
+userInputService.InputBegan:Connect(function(input, chat)
+    if chat then return end
+    if input.KeyCode == Enum.KeyCode.LeftControl then
+        if ScriptOn == false then
+            ScriptOn = true
+            print("ScriptOn")
+        else
+            ScriptOn = false
+            print("ScriptOff")
+        end
+    end
+end)  
+function FoundTarget()
+    local Target = {}
+    local HRP = game.Players.LocalPlayer.Character.HumanoidRootPart
+    for _,v in pairs(game.Workspace.Objects.Characters:GetChildren()) do
+        if v:IsA("Model") and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then
+            if playerz:FindFirstChild(v.Name).Team ~= players.Team then
+                table.insert(Target,{v.HumanoidRootPart,(HRP.Position-v.HumanoidRootPart.Position).magnitude,v})
+            end
+        end
+    end
+    table.sort(Target,
+        function(a,b)
+        return a[2]<b[2]
+    end)
+    return Target
+end
+function Aim()
+    local TargetInfo = FoundTarget()
+    local TargetPosition = camera:WorldToScreenPoint(TargetInfo[1][3].Head.Position)
+    camera.CFrame = CFrame.lookAt(camera.CFrame.Position, TargetInfo[1][3].Head.Position)
+    VIM:SendMouseMoveEvent(TargetPosition.X,TargetPosition.Y+30,game)
+end
+while wait() do
+    if ScriptOn == true then
+        pcall(Aim)
+    end
+end
