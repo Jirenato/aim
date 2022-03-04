@@ -11,26 +11,25 @@ local teams = game:GetService("Teams")
 game:service'Players'.LocalPlayer.Idled:connect(function()
 VirtualUser:CaptureController()
 VirtualUser:ClickButton2(Vector2.new())
-print("Anti-Idle")
 end)
-userInputService.InputBegan:Connect(function(input, chat)
-    if chat then return end
-    if input.KeyCode == Enum.KeyCode.LeftControl then
-        if ScriptOn == false then
-            ScriptOn = true
-            print("ScriptOn")
-        else
-            ScriptOn = false
-            print("ScriptOff")
-        end
+mouse.Button2Down:Connect(function()
+    if ScriptOn == false then
+        ScriptOn = true
     end
-end)  
+end)
+mouse.Button2Up:Connect(function()
+    if ScriptOn == true then
+        ScriptOn = false
+    end
+end)
 function FoundTarget()
     local Target = {}
     local HRP = game.Players.LocalPlayer.Character.HumanoidRootPart
     for _,v in pairs(game.Workspace.Objects.Characters:GetChildren()) do
-        if v:IsA("Model") and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then
-            if playerz:FindFirstChild(v.Name).Team ~= players.Team then
+        if v:FindFirstChild("Humanoid") and v.Humanoid.Health > 0 then
+            if v:FindFirstChildOfClass("Model") and v:FindFirstChildOfClass("Model"):FindFirstChild("Nape") then
+                --is titan shifter
+            elseif playerz:FindFirstChild(v.Name).Team ~= players.Team then
                 table.insert(Target,{v.HumanoidRootPart,(HRP.Position-v.HumanoidRootPart.Position).magnitude,v})
             end
         end
